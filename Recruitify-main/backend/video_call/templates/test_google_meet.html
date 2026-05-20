@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Google Meet Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #357ae8;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Meet Integration Test</h1>
+    
+    <div class="section">
+        <h2>Step 1: Login</h2>
+        <input type="email" id="email" placeholder="Email" value="supportind@xpresscargoinc.com">
+        <input type="password" id="password" placeholder="Password" value="">
+        <button onclick="login()">Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 2: Check Google Connection</h2>
+        <button onclick="checkConnection()">Check Connection</button>
+        <div id="connectionResult"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 3: Connect Google Calendar</h2>
+        <button onclick="connectGoogle()">Connect Google Calendar</button>
+        <div id="connectResult"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 4: Create Meet Link (After Connecting)</h2>
+        <input type="text" id="meetTitle" placeholder="Meeting Title" value="Test Interview">
+        <input type="datetime-local" id="startTime" value="">
+        <input type="number" id="duration" placeholder="Duration (minutes)" value="60">
+        <input type="email" id="attendee" placeholder="Attendee Email" value="">
+        <button onclick="createMeetLink()">Create Meet Link</button>
+        <div id="meetResult"></div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token');
+        
+        // Set default start time to tomorrow at 10 AM
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(10, 0, 0, 0);
+        document.getElementById('startTime').value = tomorrow.toISOString().slice(0, 16);
+        
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/auth/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    token = data.access;
+                    localStorage.setItem('token', token);
+                    document.getElementById('loginResult').innerHTML = 
+                        '<p class="success">✓ Logged in successfully!</p>';
+                } else {
+                    document.getElementById('loginResult').innerHTML = 
+                        '<p class="error">✗ Login failed: ' + JSON.stringify(data) + '</p>';
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = 
+                    '<p class="error">✗ Error: ' + error.message + '</p>';
+            }
+        }
+        
+        async function checkConnection() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/video/google/check/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('connectionResult').innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('connectionResult').innerHTML = 
+                    '<p class="error">✗ Error: ' + error.message + '</p>';
+            }
+        }
+        
+        async function connectGoogle() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/video/google/auth/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.authorization_url) {
+                    document.getElementById('connectResult').innerHTML = 
+                        '<p class="success">✓ Redirecting to Google...</p>';
+                    
+                    // Redirect to Google OAuth
+                    window.location.href = data.authorization_url;
+                } else {
+                    document.getElementById('connectResult').innerHTML = 
+                        '<p class="error">✗ Error: ' + JSON.stringify(data) + '</p>';
+                }
+            } catch (error) {
+                document.getElementById('connectResult').innerHTML = 
+                    '<p class="error">✗ Error: ' + error.message + '</p>';
+            }
+        }
+        
+        async function createMeetLink() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            const title = document.getElementById('meetTitle').value;
+            const startTime = document.getElementById('startTime').value;
+            const duration = parseInt(document.getElementById('duration').value);
+            const attendee = document.getElementById('attendee').value;
+            
+            // Calculate end time
+            const start = new Date(startTime);
+            const end = new Date(start.getTime() + duration * 60000);
+            
+            const attendees = attendee ? [attendee] : [];
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/video/create-meet-link/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        description: 'Test meeting created via API',
+                        start_time: start.toISOString(),
+                        end_time: end.toISOString(),
+                        attendees: attendees,
+                        timezone: 'UTC'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.meet_link) {
+                    document.getElementById('meetResult').innerHTML = 
+                        '<p class="success">✓ Meet link created!</p>' +
+                        '<p><strong>Meet Link:</strong> <a href="' + data.meet_link + '" target="_blank">' + data.meet_link + '</a></p>' +
+                        '<p><strong>Calendar Link:</strong> <a href="' + data.html_link + '" target="_blank">View in Calendar</a></p>' +
+                        '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } else {
+                    document.getElementById('meetResult').innerHTML = 
+                        '<p class="error">✗ Error: ' + JSON.stringify(data) + '</p>';
+                }
+            } catch (error) {
+                document.getElementById('meetResult').innerHTML = 
+                    '<p class="error">✗ Error: ' + error.message + '</p>';
+            }
+        }
+        
+        // Check if we're returning from Google OAuth
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('google_connected') === 'true') {
+            alert('✓ Google Calendar connected successfully!');
+        }
+    </script>
+</body>
+</html>

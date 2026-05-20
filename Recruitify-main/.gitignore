@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+env/
+.venv/
+backend/venv/
+
+# Django
+*.sqlite3
+*.sqlite3.bak
+backend/db*.sqlite3*
+backend/media/
+backend/staticfiles/
+backend/sorted_resumes/
+
+# Environment variables - NEVER commit these
+.env
+backend/.env
+*.env
+
+# Credentials - NEVER commit
+backend/credentials.json
+backend/token.json
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.pnpm-store/
+.pnpm-store/
+*.lock
+!pnpm-lock.yaml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temp / debug files
+backend/fix_*.py
+backend/check_*.py
+backend/clear_*.py
+backend/create_*.py
+backend/import_*.py
+backend/data*.json
+backend/data_*.json
+*.md
+!README.md
