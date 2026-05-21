@@ -1,14 +1,21 @@
 """
 Google Meet integration for automatic meeting link generation
 """
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import Flow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from datetime import datetime, timedelta
-from requests_oauthlib import OAuth2Session
 import os
 import json
+from datetime import datetime, timedelta
+
+# Try to import Google libraries, but make them optional
+try:
+    from google.oauth2.credentials import Credentials
+    from google_auth_oauthlib.flow import Flow
+    from googleapiclient.discovery import build
+    from googleapiclient.errors import HttpError
+    from requests_oauthlib import OAuth2Session
+    GOOGLE_AVAILABLE = True
+except ImportError:
+    GOOGLE_AVAILABLE = False
+    print("Warning: Google Calendar libraries not installed. Google Meet integration disabled.")
 
 
 class GoogleMeetService:
@@ -18,6 +25,11 @@ class GoogleMeetService:
         'https://www.googleapis.com/auth/calendar',
         'https://www.googleapis.com/auth/calendar.events'
     ]
+    
+    def __init__(self):
+        if not GOOGLE_AVAILABLE:
+            raise ImportError("Google Calendar libraries not installed. Install with: pip install google-auth google-api-python-client")
+
     
     def __init__(self):
         self.credentials_file = os.path.join(
