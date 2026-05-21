@@ -28,6 +28,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_TRUSTED_ORIGINS = [
     'https://recruitify.namits.shop',
     'https://www.recruitify.namits.shop',
+    'https://recruitify-ai-platform.vercel.app',
+    'https://recruitify-ai-platform-5l8f-17v825nqx-namit2405s-projects.vercel.app',
     'http://localhost',
     'http://127.0.0.1',
 ]
@@ -191,6 +193,11 @@ else:
     CORS_ALLOWED_ORIGINS = [
         'https://recruitify.namits.shop',
         'https://www.recruitify.namits.shop',
+        'https://recruitify-ai-platform.vercel.app',
+    ]
+    # Allow all Vercel preview deployments
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^https://recruitify-ai-platform-.*\.vercel\.app$",
     ]
 
 
