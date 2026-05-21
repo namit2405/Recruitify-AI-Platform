@@ -187,18 +187,20 @@ SIMPLE_JWT = {
 # ]
 
 # Allow all origins in development (for ngrok and Cloudflare tunnels)
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    CORS_ALLOWED_ORIGINS = [
-        'https://recruitify.namits.shop',
-        'https://www.recruitify.namits.shop',
-        'https://recruitify-ai-platform.vercel.app',
-    ]
-    # Allow all Vercel preview deployments
-    CORS_ALLOWED_ORIGIN_REGEXES = [
-        r"^https://recruitify-ai-platform-.*\.vercel\.app$",
-    ]
+# Temporarily allow all origins for Vercel deployment testing
+CORS_ALLOW_ALL_ORIGINS = True
+# if DEBUG:
+#     CORS_ALLOW_ALL_ORIGINS = True
+# else:
+#     CORS_ALLOWED_ORIGINS = [
+#         'https://recruitify.namits.shop',
+#         'https://www.recruitify.namits.shop',
+#         'https://recruitify-ai-platform.vercel.app',
+#     ]
+#     # Allow all Vercel preview deployments
+#     CORS_ALLOWED_ORIGIN_REGEXES = [
+#         r"^https://recruitify-ai-platform-.*\.vercel\.app$",
+#     ]
 
 
 CORS_ALLOW_CREDENTIALS = True
