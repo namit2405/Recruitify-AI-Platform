@@ -14,7 +14,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-change-in-productio
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok.io', '.ngrok-free.app', '.ngrok-free.dev', '.trycloudflare.com', 'recruitify.namits.shop', 'www.recruitify.namits.shop']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok.io', '.ngrok-free.app', '.ngrok-free.dev', '.trycloudflare.com', '.onrender.com', 'recruitify-ai-platform.onrender.com']
 
 # Site URLs for OAuth callbacks
 SITE_URL = os.environ.get('SITE_URL', 'http://localhost:8000')
@@ -26,10 +26,9 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # CSRF trusted origins for production
 CSRF_TRUSTED_ORIGINS = [
-    'https://recruitify.namits.shop',
-    'https://www.recruitify.namits.shop',
+    'https://recruitify-ai-platform.onrender.com',
     'https://recruitify-ai-platform.vercel.app',
-    'https://recruitify-ai-platform-5l8f-17v825nqx-namit2405s-projects.vercel.app',
+    'https://recruitify-ai-platform-5l8f-5wfukig5n-namit2405s-projects.vercel.app',
     'http://localhost',
     'http://127.0.0.1',
 ]
